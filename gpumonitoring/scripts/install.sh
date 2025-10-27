@@ -30,12 +30,12 @@ mkdir -p ${INSTALL_DIR}
 
 # Copy files
 echo "📦 Copying exporter files..."
-cp -r gpu_module.py db_prometheus.py exporter_server.py ${INSTALL_DIR}/
+cp -r gpu_module.py db_prometheus.py exporter_server.py tstats.txt ${INSTALL_DIR}/
 
 # Install dependencies
 echo "📦 Installing Python dependencies..."
 pip3 install --upgrade pip
-pip3 install prometheus_client pyhumps
+pip3 install "prometheus-client==0.23.1" "pyhumps==3.8.0"
 
 # Create systemd service file
 echo "🧩 Creating systemd service..."
