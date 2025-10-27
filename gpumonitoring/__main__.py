@@ -22,14 +22,18 @@ if __name__ == "__main__":
     )
 
     metric_port = 9001
-    log_parsing_period = 2
+
+    log_parsing_period = float(os.getenv("LOG_PARSING_PERIOD", "2"))
 
     db = DataBaseProm(metric_port)
     gpu_module = GpuModule(db, log_parsing_period)
     gpu_module.run(async_mode=True)
 
     killer = GracefulKiller()
-    logging.info("Jetson GPU Exporter started. Metrics available at :9001/metrics")
+    logging.info(
+        f"Jetson GPU Exporter started. Metrics available at :{metric_port}/metrics "
+        f"(log parsing period = {log_parsing_period}s)"
+    )
 
     while not killer.kill_now:
         time.sleep(1)
