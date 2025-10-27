@@ -52,6 +52,7 @@ ExecStart=${PYTHON_BIN} ${INSTALL_DIR}/${EXPORTER_SCRIPT}
 WorkingDirectory=${INSTALL_DIR}
 Restart=always
 Environment="PYTHONUNBUFFERED=1"
+Environment="LOG_PARSING_PERIOD=1"
 
 [Install]
 WantedBy=multi-user.target
