@@ -6,7 +6,7 @@ SERVICE_NAME="jetson_gpu_exporter"
 INSTALL_DIR="/opt/${SERVICE_NAME}"
 PYTHON_BIN="/usr/bin/python3"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-EXPORTER_SCRIPT="exporter_server.py"
+EXPORTER_SCRIPT="__main__.py"
 
 echo "============================================="
 echo "🚀 Installing Jetson GPU Prometheus Exporter"
@@ -32,7 +32,7 @@ mkdir -p ${INSTALL_DIR}
 # Copy files
 echo "📦 Copying exporter files..."
 cd "${SCRIPT_DIR}/.."
-cp -r gpu_module.py db_prometheus.py exporter_server.py tstats.txt ${INSTALL_DIR}/
+cp -r gpu_module.py db_prometheus.py __main__.py tstats.txt ${INSTALL_DIR}/
 
 # Install dependencies
 echo "📦 Installing Python dependencies..."
