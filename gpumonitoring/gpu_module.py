@@ -34,7 +34,7 @@ GPU_SOURCE = "tegrastats"
 logger = logging.getLogger(__name__)
 
 
-class GpuEvent():
+class GpuEvent:
     def __init__(self, key, value, label, **kwargs):
         self.timestamp = datetime.utcnow().isoformat()
         self.module = GPU_SOURCE
@@ -47,9 +47,9 @@ class GpuEvent():
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-
     def to_dict(self):
         return humps.camelize(self.__dict__)
+
 
 class GpuModule:
     "GpuModule class that monitors gpu utilization through tegrastats"
@@ -64,11 +64,7 @@ class GpuModule:
         self.tegrastats_subprocess = None
 
     def store_gpu_event(
-        self,
-        metric_value: str,
-        metric_name: str,
-        metric_key: str,
-        **kwargs
+        self, metric_value: str, metric_name: str, metric_key: str, **kwargs
     ) -> None:
         event = GpuEvent(metric_key, metric_value, metric_name, **kwargs)
         self.db.store(event.to_dict())
@@ -85,14 +81,16 @@ class GpuModule:
         script = "sudo cat /sys/kernel/debug/nvmap/iovmm/clients"
         self.per_process_usage = {}
         try:
-            output = subprocess.run(script.split(' '), stdout=subprocess.PIPE, timeout=1)
-            self.per_process_usage = output.stdout.decode('utf-8').strip()
+            output = subprocess.run(
+                script.split(" "), stdout=subprocess.PIPE, timeout=1
+            )
+            self.per_process_usage = output.stdout.decode("utf-8").strip()
         except Exception:
-            raise Exception('Unable to get per process GPU usage  !')
+            raise Exception("Unable to get per process GPU usage  !")
 
     def _parse_per_process_gpu_stats(self):
         process_mem_usage = {}
-        per_process_usage = self.per_process_usage.split('\n')[1:-1]
+        per_process_usage = self.per_process_usage.split("\n")[1:-1]
         for process_info in per_process_usage:
             process_info = process_info.split()
             # sample prcess_info:
@@ -109,17 +107,19 @@ class GpuModule:
         try:
             # launch a process group so that all child processes get purged as well when the command
             # times out due to high cpu usage
-            p = subprocess.Popen(script.split(' '), stdout=subprocess.PIPE, preexec_fn=os.setsid)
+            p = subprocess.Popen(
+                script.split(" "), stdout=subprocess.PIPE, preexec_fn=os.setsid
+            )
             self.tegrastats_subprocess = p
             output, _ = p.communicate(timeout=1)
         except Exception:
             os.killpg(os.getpgid(p.pid), signal.SIGTERM)
-            raise Exception('Unable to call tegrastats utility !')
+            raise Exception("Unable to call tegrastats utility !")
         try:
-            self.tegra_stats = output.decode('utf-8').strip()
+            self.tegra_stats = output.decode("utf-8").strip()
             return self.tegra_stats
         except Exception:
-            raise Exception('Unable to decode tegrastats output !')
+            raise Exception("Unable to decode tegrastats output !")
 
     def _parse_tegra_stats(self, tegra_stats_buffer, tegra_stats_iter):
         entity = next(tegra_stats_iter, None)
@@ -148,14 +148,16 @@ class GpuModule:
         if entity == "GR3D_FREQ":
             gpu_info = next(tegra_stats_iter)
             gpu_util = gpu_info.split("%")[0]
-            gpu_freq = gpu_info.split("@")[-1].replace("[", "").replace("]", "").split(",")
-            gpu_freq = [str(int(g)*int(1E6)) for g in gpu_freq]
+            gpu_freq = (
+                gpu_info.split("@")[-1].replace("[", "").replace("]", "").split(",")
+            )
+            gpu_freq = [str(int(g) * int(1e6)) for g in gpu_freq]
             tegra_stats_buffer["GPU_UTIL"] = gpu_util
             tegra_stats_buffer["GPU_FREQ"] = gpu_freq
 
         if entity in ["NVENC", "NVENC1", "NVDEC", "NVDEC1"]:
             nv_info = next(tegra_stats_iter)
-            if nv_info != 'off':
+            if nv_info != "off":
                 nv_info = str(int(nv_info.split("@")[-1]) * 1000000)
                 tegra_stats_buffer[entity] = nv_info
 
@@ -183,9 +185,11 @@ class GpuModule:
                         gpc_freq,
                         "GPU_FREQ",
                         "tegrastats_gpu_freq",
-                        **dict(index=gpc_id)
+                        **dict(index=gpc_id),
                     )
-                    self.metric_set["GPU_FREQ"].add("tegrastats_gpu_freq_{}".format(gpc_id))
+                    self.metric_set["GPU_FREQ"].add(
+                        "tegrastats_gpu_freq_{}".format(gpc_id)
+                    )
             if k == "GPU_TEMP":
                 self.store_gpu_event(
                     v,
@@ -202,14 +206,16 @@ class GpuModule:
                 self.metric_set["CPU_TEMP"].add("tegrastats_cpu_temp")
             if k == "CPU":
                 for cpu_id, cpu_util in enumerate(v):
-                    if cpu_util != 'off':
+                    if cpu_util != "off":
                         self.store_gpu_event(
                             cpu_util,
                             "CPU",
                             "tegrastats_cpu_usage",
-                            **dict(index=cpu_id)
+                            **dict(index=cpu_id),
                         )
-                        self.metric_set["CPU"].add("tegrastats_cpu_usage_{}".format(cpu_id))
+                        self.metric_set["CPU"].add(
+                            "tegrastats_cpu_usage_{}".format(cpu_id)
+                        )
             if k == "RAM":
                 self.store_gpu_event(
                     v,
@@ -261,7 +267,11 @@ class GpuModule:
                 self.metric_set["NVDEC1"].add("tegrastats_nvdec1_freq")
 
         for k, v in self.per_process_usage.items():
-            self.store_gpu_event(v, k, "tegrastats_per_process_gpu_mem",)
+            self.store_gpu_event(
+                v,
+                k,
+                "tegrastats_per_process_gpu_mem",
+            )
             self.metric_set[k].add("tegrastats_per_process_gpu_mem")
 
     def _process_gpu_stats_forever(self):
@@ -280,7 +290,8 @@ class GpuModule:
                 while True:
                     try:
                         entity = self._parse_tegra_stats(
-                            tegra_stats_buffer, tegra_stats_iter)
+                            tegra_stats_buffer, tegra_stats_iter
+                        )
                         if entity is None:
                             break
                     except Exception as e:
@@ -311,7 +322,9 @@ class GpuModule:
 
     def run(self, async_mode=True):
         if async_mode:
-            self.td = threading.Thread(target=self._process_gpu_stats_forever, args=(), daemon=True)
+            self.td = threading.Thread(
+                target=self._process_gpu_stats_forever, args=(), daemon=True
+            )
             self.td.start()
             return self.td
         else:
