@@ -78,7 +78,7 @@ class GpuModule:
             logger.exception("Unable to nullify GPU data !!!")
 
     def _get_per_process_gpu_stats(self):
-        script = "sudo cat /sys/kernel/debug/nvmap/iovmm/clients"
+        script = "cat /sys/kernel/debug/nvmap/iovmm/clients"
         self.per_process_usage = {}
         try:
             output = subprocess.run(
@@ -101,7 +101,7 @@ class GpuModule:
         self.per_process_usage = process_mem_usage
 
     def _get_tegra_stats(self):
-        script = "sudo timeout 0.2 tegrastats --load_cfg ./tstats.txt --interval 100"
+        script = "timeout 0.2 tegrastats --load_cfg ./tstats.txt --interval 100"
         self.tegra_stats = ""
 
         try:
