@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVICE_NAME="jetson_gpu_exporter"
 INSTALL_DIR="/opt/${SERVICE_NAME}"
 PYTHON_BIN="/usr/bin/python3"
@@ -30,6 +31,7 @@ mkdir -p ${INSTALL_DIR}
 
 # Copy files
 echo "📦 Copying exporter files..."
+cd "${SCRIPT_DIR}/.."
 cp -r gpu_module.py db_prometheus.py exporter_server.py tstats.txt ${INSTALL_DIR}/
 
 # Install dependencies
