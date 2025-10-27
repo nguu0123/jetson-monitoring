@@ -1,0 +1,17 @@
+APE,/sys/kernel/debug/bpmp/debug/clk/ape/rate
+EMC_FREQ,/sys/kernel/debug/bpmp/debug/clk/emc/rate
+EMC_LOAD,/sys/kernel/actmon_avg_activity/mc_all
+GR3D_FREQ,/sys/kernel/debug/bpmp/debug/clk/gpcclk/rate
+IGPU_LOAD,/sys/devices/gpu.0/load
+NVENC_ENBL,/sys/kernel/debug/clk/nvenc/clk_enable_count
+NVENC1_ENBL,/sys/kernel/debug/clk/nvenc1/clk_enable_count
+NVENC,/sys/kernel/debug/bpmp/debug/clk/nvenc/rate
+NVENC1,/sys/kernel/debug/bpmp/debug/clk/nvenc1/rate
+NVDEC_ENBL,/sys/kernel/debug/clk/nvdec/clk_enable_count
+NVDEC1_ENBL,/sys/kernel/debug/clk/nvdec1/clk_enable_count
+NVDEC,/sys/kernel/debug/bpmp/debug/clk/nvdec/rate
+NVDEC1,/sys/kernel/debug/bpmp/debug/clk/nvdec1/rate
+NVJPG_ENBL,/sys/kernel/debug/clk/nvjpg/clk_enable_count
+NVJPG,/sys/kernel/debug/bpmp/debug/clk/nvjpg/rate
+VIC_FREQ,/sys/kernel/debug/clk/vic/clk_rate
+VIC_LOAD,/sys/kernel/debug/vic/actmon_avg_norm
